@@ -1,5 +1,5 @@
 import pandas as pd
-from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
 import torch
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset
@@ -11,7 +11,7 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, idx):
         item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
-        item['labels'] = torch.tensor(self.labels[idx])
+        item['labels'] = torch.tensor(self.labels[idx], dtype=torch.long)
         return item
 
     def __len__(self):
@@ -21,7 +21,7 @@ def tokenize_data(X, y, max_length=512):
     encodings = tokenizer(X, padding=True, truncation=True, max_length=max_length)
     return CustomDataset(encodings, y)
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+tokenizer = AutoTokenizer.from_pretrained('distilroberta-base')
 label_encoder = LabelEncoder()
 
 def get_tsv_data(file_path):
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     val_dataset = tokenize_data(X_val, y_val_encoded)
     test_dataset = tokenize_data(X_test, y_test_encoded)
 
-    model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(set(y_train)))
+    model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
 
     # Define training arguments
     training_args = TrainingArguments(
