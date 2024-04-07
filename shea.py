@@ -1,8 +1,11 @@
 import pandas as pd
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 import torch
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset
+from sklearn.metrics import f1_score
+import numpy as np
+import sys
 
 class CustomDataset(Dataset):
     def __init__(self, encodings, labels):
@@ -51,16 +54,30 @@ if __name__ == '__main__':
     val_dataset = tokenize_data(X_val, y_val_encoded)
     test_dataset = tokenize_data(X_test, y_test_encoded)
 
-    model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
+    model_path = '/home/shea.durgin/netstore1/distilroberta_results'
 
+    if 'train' in sys.argv:
+        model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
+    else:
+        else:
+        model = AutoModelForSequenceClassification.from_pretrained(model_path)
+
+    # Early Stopping
+    early_stopping = EarlyStoppingCallback(early_stopping_patience=3)
+    
     # Define training arguments
     training_args = TrainingArguments(
-        output_dir='./results',
+        output_dir=model_path,
+        learning_rate=2e-5,
+        weight_decay=0.01,
+        load_best_model_at_end = True,
         per_device_train_batch_size=32,
         per_device_eval_batch_size=32,
-        num_train_epochs=3,
+        num_train_epochs=10,
         logging_dir='./logs',
         logging_steps=100,
+        evaluation_strategy='epoch',
+        save_strategy='epoch'
     )
 
     # Define Trainer
@@ -69,14 +86,29 @@ if __name__ == '__main__':
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
+        callbacks=[early_stopping],
     )
 
-    print('training')
-
-    # Train the model
-    trainer.train()
+    if 'train' in sys.argv:
+        # Train the model
+        trainer.train()
+        trainer.save_model(model_path)
 
     # Evaluate the model
-    eval_results = trainer.evaluate(eval_dataset=test_dataset)
-    print(eval_results)
-    
+    test_results = trainer.predict(test_dataset)
+
+    # Extract predicted labels
+    predicted_labels = np.argmax(test_results.predictions, axis=1)
+
+    # Decode predicted labels
+    predicted_labels = label_encoder.inverse_transform(predicted_labels)
+
+    # Calculate F1 score for each class and total F1 score
+    f1_scores_per_class = f1_score(y_test, predicted_labels, average=None)
+    total_f1_score = f1_score(y_test, predicted_labels, average='weighted')
+
+    # Print F1 scores
+    for label, f1_score_class in zip(label_encoder.classes_, f1_scores_per_class):
+        print(f"F1 score for class {label}: {f1_score_class}")
+
+    print(f"Total F1 score: {total_f1_score}")
