@@ -54,12 +54,11 @@ if __name__ == '__main__':
     val_dataset = tokenize_data(X_val, y_val_encoded)
     test_dataset = tokenize_data(X_test, y_test_encoded)
 
-    model_path = '/home/shea.durgin/netstore1/distilroberta_results'
+    model_path = '/home/shea.durgin/netstore1/4-7-distilroberta_results'
 
     if 'train' in sys.argv:
         model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
     else:
-        else:
         model = AutoModelForSequenceClassification.from_pretrained(model_path)
 
     # Early Stopping
@@ -73,7 +72,7 @@ if __name__ == '__main__':
         load_best_model_at_end = True,
         per_device_train_batch_size=32,
         per_device_eval_batch_size=32,
-        num_train_epochs=10,
+        num_train_epochs=3,
         logging_dir='./logs',
         logging_steps=100,
         evaluation_strategy='epoch',
