@@ -54,12 +54,12 @@ if __name__ == '__main__':
     val_dataset = tokenize_data(X_val, y_val_encoded)
     test_dataset = tokenize_data(X_test, y_test_encoded)
 
-    model_path = '/home/shea.durgin/netstore1/4-7-distilroberta_results'
+    # model_path = '/home/shea.durgin/netstore1/4-7-distilroberta_results'
 
     if 'train' in sys.argv:
         model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
-    else:
-        model = AutoModelForSequenceClassification.from_pretrained(model_path)
+    # else:
+    #     model = AutoModelForSequenceClassification.from_pretrained(model_path)
 
     # Early Stopping
     early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 	    print(f"using {param}")
 	    # Define training arguments
 	    training_args = TrainingArguments(
-	        output_dir=model_path,
+	        # output_dir=model_path,
 	        learning_rate=2e-5,
 	        weight_decay=0.01,
 	        load_best_model_at_end = True,
@@ -78,7 +78,7 @@ if __name__ == '__main__':
 	        logging_dir='./logs',
 	        logging_steps=100,
 	        evaluation_strategy='epoch',
-	        save_strategy='epoch'
+	        # save_strategy='epoch'
 	    )
 
 	    # Define Trainer
@@ -93,7 +93,7 @@ if __name__ == '__main__':
 	    if 'train' in sys.argv:
 	        # Train the model
 	        trainer.train()
-	        trainer.save_model(model_path)
+	        # trainer.save_model(model_path)
 
 	    # Evaluate the model
 	    test_results = trainer.predict(test_dataset)
