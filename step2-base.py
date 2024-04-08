@@ -5,7 +5,6 @@ from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset
 from sklearn.metrics import f1_score
 import numpy as np
-import sys
 
 class CustomDataset(Dataset):
 	def __init__(self, encodings, labels):
@@ -56,10 +55,7 @@ if __name__ == '__main__':
 
 	# model_path = '/home/shea.durgin/netstore1/4-7-distilroberta_results'
 
-	if 'train' in sys.argv:
-		model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
-	# else:
-	#     model = AutoModelForSequenceClassification.from_pretrained(model_path)
+	model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
 
     # Early Stopping
 	early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
@@ -90,10 +86,9 @@ if __name__ == '__main__':
 			callbacks=[early_stopping],
 		)
 
-		if 'train' in sys.argv:
-			# Train the model
-			trainer.train()
-			# trainer.save_model(model_path)
+		# Train the model
+		trainer.train()
+		# trainer.save_model(model_path)
 
 		# Evaluate the model
 		test_results = trainer.predict(test_dataset)
