@@ -5,6 +5,7 @@ from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset
 from sklearn.metrics import f1_score
 import numpy as np
+import json
 
 class CustomDataset(Dataset):
     def __init__(self, encodings, labels):
@@ -55,6 +56,8 @@ if __name__ == '__main__':
 
     model_path = '/home/shea.durgin/netstore1/distilroberta_results'
 
+    results = {}
+
     # Early Stopping
     early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
     hyperparameters = [4, 6, 8, 10]
@@ -101,9 +104,14 @@ if __name__ == '__main__':
         # Calculate F1 score for each class and total F1 score
         f1_scores_per_class = f1_score(y_test, predicted_labels, average=None)
         total_f1_score = f1_score(y_test, predicted_labels, average='weighted')
-
+        results[epoch] = {}
         # Print F1 scores
         for label, f1_score_class in zip(label_encoder.classes_, f1_scores_per_class):
+            results[epoch][label] = f1_score_class
             print(f"F1 score for class {label}: {f1_score_class}")
 
         print(f"Total F1 score: {total_f1_score}")
+        results[epoch]['avg'] = total_f1_score
+
+with open("epochs.json", "w") as f: 
+    json.dump(results, f)
