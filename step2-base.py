@@ -62,52 +62,54 @@ if __name__ == '__main__':
         model = AutoModelForSequenceClassification.from_pretrained(model_path)
 
     # Early Stopping
-    early_stopping = EarlyStoppingCallback(early_stopping_patience=3)
-    
-    # Define training arguments
-    training_args = TrainingArguments(
-        output_dir=model_path,
-        learning_rate=2e-5,
-        weight_decay=0.01,
-        load_best_model_at_end = True,
-        per_device_train_batch_size=32,
-        per_device_eval_batch_size=32,
-        num_train_epochs=3,
-        logging_dir='./logs',
-        logging_steps=100,
-        evaluation_strategy='epoch',
-        save_strategy='epoch'
-    )
+    early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
+    hyperparameters = []
+    for param in hyperparameters:
+	    print(f"using {param}")
+	    # Define training arguments
+	    training_args = TrainingArguments(
+	        output_dir=model_path,
+	        learning_rate=2e-5,
+	        weight_decay=0.01,
+	        load_best_model_at_end = True,
+	        per_device_train_batch_size=32,
+	        per_device_eval_batch_size=32,
+	        num_train_epochs=4,
+	        logging_dir='./logs',
+	        logging_steps=100,
+	        evaluation_strategy='epoch',
+	        save_strategy='epoch'
+	    )
 
-    # Define Trainer
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=val_dataset,
-        callbacks=[early_stopping],
-    )
+	    # Define Trainer
+	    trainer = Trainer(
+	        model=model,
+	        args=training_args,
+	        train_dataset=train_dataset,
+	        eval_dataset=val_dataset,
+	        callbacks=[early_stopping],
+	    )
 
-    if 'train' in sys.argv:
-        # Train the model
-        trainer.train()
-        trainer.save_model(model_path)
+	    if 'train' in sys.argv:
+	        # Train the model
+	        trainer.train()
+	        trainer.save_model(model_path)
 
-    # Evaluate the model
-    test_results = trainer.predict(test_dataset)
+	    # Evaluate the model
+	    test_results = trainer.predict(test_dataset)
 
-    # Extract predicted labels
-    predicted_labels = np.argmax(test_results.predictions, axis=1)
+	    # Extract predicted labels
+	    predicted_labels = np.argmax(test_results.predictions, axis=1)
 
-    # Decode predicted labels
-    predicted_labels = label_encoder.inverse_transform(predicted_labels)
+	    # Decode predicted labels
+	    predicted_labels = label_encoder.inverse_transform(predicted_labels)
 
-    # Calculate F1 score for each class and total F1 score
-    f1_scores_per_class = f1_score(y_test, predicted_labels, average=None)
-    total_f1_score = f1_score(y_test, predicted_labels, average='weighted')
+	    # Calculate F1 score for each class and total F1 score
+	    f1_scores_per_class = f1_score(y_test, predicted_labels, average=None)
+	    total_f1_score = f1_score(y_test, predicted_labels, average='weighted')
 
-    # Print F1 scores
-    for label, f1_score_class in zip(label_encoder.classes_, f1_scores_per_class):
-        print(f"F1 score for class {label}: {f1_score_class}")
+	    # Print F1 scores
+	    for label, f1_score_class in zip(label_encoder.classes_, f1_scores_per_class):
+	        print(f"F1 score for class {label}: {f1_score_class}")
 
-    print(f"Total F1 score: {total_f1_score}")
+	    print(f"Total F1 score: {total_f1_score}")
