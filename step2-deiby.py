@@ -68,14 +68,14 @@ if __name__ == '__main__':
     # Define training arguments
     training_args = TrainingArguments(
         output_dir=model_path,
-        learning_rate=1e-5,
-        weight_decay=0.001,
+        learning_rate=2e-5,
+        weight_decay=0.01,
         load_best_model_at_end = True,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
-        num_train_epochs=4,
+        per_device_train_batch_size=32,
+        per_device_eval_batch_size=32,
+        num_train_epochs=5,
         logging_dir='./logs',
-        logging_steps=200,
+        logging_steps=100,
         evaluation_strategy='epoch',
         save_strategy='epoch'
     )
