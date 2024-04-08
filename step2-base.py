@@ -55,12 +55,11 @@ if __name__ == '__main__':
 
     model_path = '/home/shea.durgin/netstore1/distilroberta_results'
 
-    model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
-    print("got model")
     # Early Stopping
     early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
     hyperparameters = [16, 32, 64, 128] # set this to your values
     for param in hyperparameters:
+		model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
         print(f"using {param}")
         # Define training arguments
         training_args = TrainingArguments(
