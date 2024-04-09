@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     # Early Stopping
     early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
-    hyperparameters = [16, 32, 64, 128]
+    hyperparameters = [16, 32, 64]
     for batch_size in hyperparameters:
         model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
         print(f"using {batch_size}")
