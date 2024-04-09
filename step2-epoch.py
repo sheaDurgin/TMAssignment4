@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     # Early Stopping
     early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
-    hyperparameters = [4, 6, 8]
+    hyperparameters = [2, 4, 6, 8]
     for epoch in hyperparameters:
         model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
         print(f"using {epoch}")
@@ -113,5 +113,5 @@ if __name__ == '__main__':
         print(f"Total F1 score: {total_f1_score}")
         results[epoch]['avg'] = total_f1_score
 
-    with open("epochs.json", "w") as f: 
+    with open("2_epoch.json", "w") as f: 
         json.dump(results, f)
