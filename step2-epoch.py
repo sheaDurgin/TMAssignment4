@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     # Early Stopping
     early_stopping = EarlyStoppingCallback(early_stopping_patience=2)
-    hyperparameters = [4, 6, 8, 10]
+    hyperparameters = [4, 6, 8]
     for epoch in hyperparameters:
         model = AutoModelForSequenceClassification.from_pretrained('distilroberta-base', num_labels=len(set(y_train)))
         print(f"using {epoch}")
